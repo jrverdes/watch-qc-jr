@@ -242,6 +242,7 @@ body {
         z-index: 2002;
         padding-bottom: 18px;
         overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
         border-radius: 0 12px 12px 0;
         transition: transform 0.24s cubic-bezier(.77,0,.18,1);
     }
@@ -388,6 +389,8 @@ document.addEventListener('keydown', function(e){
 function init() {
     setupEventListeners();
     updateInfo();
+     // --- HACER VISIBLE LA SIDEBAR SOLO EN MÓVIL ---
+    if(window.innerWidth <= 768) sidebar.classList.add('visible');
 }
 function setupEventListeners() {
     document.addEventListener('wheel', handleWheel, { passive: false });
