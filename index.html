@@ -219,10 +219,28 @@ body {
 }
 .file-input { display: none; }
 @media (max-width: 768px) {
-    .sidebar { width: 100%; height: 100vh; position: fixed; z-index: 1500; transform: translateX(-100%);}
-    .sidebar.visible { transform: translateX(0);}
+    .container {
+        flex-direction: column;
+        height: auto;
+        min-height: 100vh;
+    }
+    .sidebar {
+        width: 100vw;
+        height: auto;
+        min-height: 220px;
+        position: relative;
+        z-index: 2000;
+        transform: none;
+        box-sizing: border-box;
+        padding-bottom: 2vw;
+    }
+    .main-area {
+        min-height: 230px;
+        /* Puedes ajustar el alto máximo según necesidad */
+    }
     .logo-btn-row { flex-direction: column; align-items: flex-start;}
 }
+
 </style>
 </head>
 <body>
