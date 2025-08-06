@@ -549,26 +549,32 @@ function addHorizontalLine() {
     line.className = 'horizontal-line';
     line.innerHTML = `<span class="line-icon" title="Horizontal">—</span>`;
     line.style.top = '50%';
+    // Añade esta línea para que siempre haya una coordenada horizontal válida
+    line.style.left = '0px';
     makeDraggable(line, 'vertical');
     toolsOverlay.appendChild(line);
     tools.push(line);
 }
+
 function addVerticalLine() {
     const line = document.createElement('div');
     line.className = 'vertical-line';
     line.innerHTML = `<span class="line-icon" title="Vertical">
-    <svg width="18" height="18" viewBox="0 0 18 18" style="display:inline;vertical-align:middle">
-        <circle cx="9" cy="9" r="8" fill="#FFFFFF22" stroke="#fff" stroke-width="1.6"/>
-        <polyline points="9,4 9,14" stroke="#fff" stroke-width="2.1" fill="none"/>
-        <polygon points="6,7 9,4 12,7" fill="#fff"/>
-        <polygon points="6,11 9,14 12,11" fill="#fff"/>
-    </svg>
+        <svg width="18" height="18" viewBox="0 0 18 18" style="display:inline;vertical-align:middle">
+            <circle cx="9" cy="9" r="8" fill="#FFFFFF22" stroke="#fff" stroke-width="1.6"/>
+            <polyline points="9,4 9,14" stroke="#fff" stroke-width="2.1" fill="none"/>
+            <polygon points="6,7 9,4 12,7" fill="#fff"/>
+            <polygon points="6,11 9,14 12,11" fill="#fff"/>
+        </svg>
     </span>`;
     line.style.left = '50%';
+    // Añade esta línea para que siempre haya una coordenada vertical válida
+    line.style.top = '0px';
     makeDraggable(line, 'horizontal');
     toolsOverlay.appendChild(line);
     tools.push(line);
 }
+
 // NUEVA makeDraggable (ratón + táctil):
 function makeDraggable(element, direction = 'both') {
     let drag = false, sX, sY, sLeft, sTop;
