@@ -539,8 +539,11 @@ function addVerticalLine() {
     toolsOverlay.appendChild(line);
     tools.push(line);
 }
+// NUEVA makeDraggable (ratón + táctil):
 function makeDraggable(element, direction = 'both') {
     let drag = false, sX, sY, sLeft, sTop;
+
+    // Ratón
     element.addEventListener('mousedown', function(e) {
         drag = true; sX = e.clientX; sY = e.clientY;
         sLeft = parseInt(element.style.left) || 0;
@@ -555,6 +558,25 @@ function makeDraggable(element, direction = 'both') {
         if (direction === 'both' || direction === 'vertical') element.style.top = (sTop + dy) + 'px';
     });
     document.addEventListener('mouseup', function() { drag = false; });
+
+    // Táctil
+    element.addEventListener('touchstart', function(e) {
+        if (e.touches.length !== 1) return;
+        const touch = e.touches[0];
+        drag = true; sX = touch.clientX; sY = touch.clientY;
+        sLeft = parseInt(element.style.left) || 0;
+        sTop = parseInt(element.style.top) || 0;
+        e.preventDefault(); e.stopPropagation();
+    }, {passive: false});
+    document.addEventListener('touchmove', function(e) {
+        if (!drag || e.touches.length !== 1) return;
+        const touch = e.touches[0];
+        const dx = touch.clientX - sX;
+        const dy = touch.clientY - sY;
+        if (direction === 'both' || direction === 'horizontal') element.style.left = (sLeft + dx) + 'px';
+        if (direction === 'both' || direction === 'vertical') element.style.top = (sTop + dy) + 'px';
+    }, {passive: false});
+    document.addEventListener('touchend', function(e) { drag = false; }, {passive: false});
 }
 function toggleCheck(checkbox) {
     checkbox.parentNode.parentNode.classList.toggle('completed', checkbox.checked);
