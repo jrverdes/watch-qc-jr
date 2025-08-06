@@ -1,4 +1,4 @@
-# Watch QC JR
+# Watch QC JR "ENG"
 
 **Watch QC JR** is a minimal and professional web tool designed to visually align and quality-check wristwatch photos using rulers, fine-tuned lines, and a customizable QC checklist — ideal for collectors, sellers, and watch enthusiasts.
 
@@ -57,7 +57,7 @@ _Created by **jrverdes** — made to keep your watch QC sharp._
 
 ///////////////////////////////////////////////////////////// 
 
-# Watch QC JR
+# Watch QC JR "ESP"
 
 **Watch QC JR** es una herramienta web minimalista y profesional para revisar fotografías de relojes mediante reglas, líneas de referencia y una checklist visual personalizable.  
 Ideal para coleccionistas, vendedores o cualquier amante de la relojería.
