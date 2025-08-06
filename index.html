@@ -537,9 +537,16 @@ function addIndexRuler() {
     ruler.className = 'index-ruler';
     ruler.style.width = '300px';
     ruler.style.height = '300px';
-    ruler.style.left = '50%';
-    ruler.style.top = '50%';
-    ruler.style.transform = 'translate(-50%, -50%)';
+
+    // Calcula el centro de la overlay en píxeles
+    const overlayRect = toolsOverlay.getBoundingClientRect();
+    const left = overlayRect.width / 2 - 150; // 150 es la mitad del tamaño inicial
+    const top = overlayRect.height / 2 - 150;
+
+    ruler.style.left = left + 'px';
+    ruler.style.top = top + 'px';
+    ruler.style.transform = '';
+
     makeDraggable(ruler);
     toolsOverlay.appendChild(ruler);
     tools.push(ruler);
@@ -547,19 +554,8 @@ function addIndexRuler() {
 function addHorizontalLine() {
     const line = document.createElement('div');
     line.className = 'horizontal-line';
-    line.innerHTML = `<span class="line-icon" title="Horizontal">—</span>`;
-    line.style.top = '50%';
-    line.style.left = '50%';                      // Centrado horizontal
-    line.style.transform = 'translateX(-50%)';    // Icono en el centro real
-    makeDraggable(line, 'vertical');
-    toolsOverlay.appendChild(line);
-    tools.push(line);
-}
-
-function addVerticalLine() {
-    const line = document.createElement('div');
-    line.className = 'vertical-line';
-    line.innerHTML = `<span class="line-icon" title="Vertical">
+    line.innerHTML = `<span class="line-icon" title="Horizontal" 
+        style="position: absolute; left: 50%; top: -9px; transform: translateX(-50%) rotate(90deg); z-index: 3;">
         <svg width="18" height="18" viewBox="0 0 18 18" style="display:inline;vertical-align:middle">
             <circle cx="9" cy="9" r="8" fill="#FFFFFF22" stroke="#fff" stroke-width="1.6"/>
             <polyline points="9,4 9,14" stroke="#fff" stroke-width="2.1" fill="none"/>
@@ -567,14 +563,38 @@ function addVerticalLine() {
             <polygon points="6,11 9,14 12,11" fill="#fff"/>
         </svg>
     </span>`;
-    line.style.left = '50%';
-    // Añade esta línea para que siempre haya una coordenada vertical válida
+    // Centra en píxeles:
+    const overlayRect = toolsOverlay.getBoundingClientRect();
+    line.style.top = (overlayRect.height / 2) + 'px';
+    line.style.left = '0px';
+    line.style.width = '100vw';
+    line.style.transform = '';
+    makeDraggable(line, 'vertical');
+    toolsOverlay.appendChild(line);
+    tools.push(line);
+}
+function addVerticalLine() {
+    const line = document.createElement('div');
+    line.className = 'vertical-line';
+    line.innerHTML = `<span class="line-icon" title="Vertical" 
+        style="position: absolute; top: 50%; left: -9px; transform: translateY(-50%); z-index: 3;">
+        <svg width="18" height="18" viewBox="0 0 18 18" style="display:inline;vertical-align:middle">
+            <circle cx="9" cy="9" r="8" fill="#FFFFFF22" stroke="#fff" stroke-width="1.6"/>
+            <polyline points="9,4 9,14" stroke="#fff" stroke-width="2.1" fill="none"/>
+            <polygon points="6,7 9,4 12,7" fill="#fff"/>
+            <polygon points="6,11 9,14 12,11" fill="#fff"/>
+        </svg>
+    </span>`;
+    // Centra en píxeles:
+    const overlayRect = toolsOverlay.getBoundingClientRect();
+    line.style.left = (overlayRect.width / 2) + 'px';
     line.style.top = '0px';
+    line.style.height = '100vh';
+    line.style.transform = '';
     makeDraggable(line, 'horizontal');
     toolsOverlay.appendChild(line);
     tools.push(line);
 }
-
 // NUEVA makeDraggable (ratón + táctil):
 function makeDraggable(element, direction = 'both') {
     let drag = false, sX, sY, sLeft, sTop;
