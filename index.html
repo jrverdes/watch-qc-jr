@@ -549,8 +549,8 @@ function addHorizontalLine() {
     line.className = 'horizontal-line';
     line.innerHTML = `<span class="line-icon" title="Horizontal">—</span>`;
     line.style.top = '50%';
-    // Añade esta línea para que siempre haya una coordenada horizontal válida
-    line.style.left = '0px';
+    line.style.left = '50%';                      // Centrado horizontal
+    line.style.transform = 'translateX(-50%)';    // Icono en el centro real
     makeDraggable(line, 'vertical');
     toolsOverlay.appendChild(line);
     tools.push(line);
