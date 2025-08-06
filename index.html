@@ -25,6 +25,8 @@ body {
     flex-direction: column;
     align-items: center;
     z-index: 1000;
+    transition: transform 0.22s cubic-bezier(.86,0,.07,1.01);
+    position: relative;
 }
 .logo-btn-row {
     width: 100%;
@@ -87,7 +89,7 @@ body {
     display: flex;
     flex-direction: column;
     gap: 2px;
-    margin-bottom: 2px; /* Ajuste: elimina salto de línea extra tras checklist */
+    margin-bottom: 2px;
 }
 .checklist li {
     display: flex;
@@ -217,7 +219,12 @@ body {
     padding: 12px 16px; border-radius: 8px;
     font-size: 14px; z-index: 2000;
 }
-.file-input { display: none; }
+.hamburger-btn {
+    display: none;
+}
+.sidebar-overlay {
+    display: none;
+}
 @media (max-width: 768px) {
     .container {
         flex-direction: column;
@@ -225,25 +232,60 @@ body {
         min-height: 100vh;
     }
     .sidebar {
-        width: 100vw;
-        height: auto;
-        min-height: 220px;
-        position: relative;
-        z-index: 2000;
-        transform: none;
-        box-sizing: border-box;
-        padding-bottom: 2vw;
+        width: 84vw;
+        max-width: 320px;
+        height: 100vh;
+        position: fixed;
+        left: 0; top: 0;
+        transform: translateX(-105%);
+        box-shadow: 2px 0 16px #0009;
+        z-index: 2002;
+        padding-bottom: 18px;
+        overflow-y: auto;
+        border-radius: 0 12px 12px 0;
+        transition: transform 0.24s cubic-bezier(.77,0,.18,1);
+    }
+    .sidebar.visible {
+        transform: translateX(0);
+    }
+    .hamburger-btn {
+        display: inline-flex;
+        position: fixed;
+        top: 13px; left: 11px;
+        width: 44px; height: 44px;
+        align-items: center; justify-content: center;
+        background: #2d2d2d;
+        border-radius: 13px;
+        border: none;
+        z-index: 2200;
+        box-shadow: 0 1px 7px #0004;
+        color: #fff;
+        cursor: pointer;
     }
     .main-area {
         min-height: 230px;
-        /* Puedes ajustar el alto máximo según necesidad */
     }
-    .logo-btn-row { flex-direction: column; align-items: flex-start;}
+    .sidebar-overlay {
+        display: block;
+        position: fixed;
+        left:0; top:0; right:0; bottom:0;
+        background: #0005;
+        z-index: 2001;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.21s;
+    }
+    .sidebar.visible ~ .sidebar-overlay {
+        opacity: 1;
+        pointer-events: all;
+    }
 }
-
 </style>
 </head>
 <body>
+<button class="hamburger-btn" id="sidebarToggle" aria-label="Abrir menú">
+    <span class="material-icons" style="font-size:28px;">menu</span>
+</button>
 <div class="container">
     <div class="sidebar" id="sidebar">
         <div class="logo-btn-row">
@@ -269,7 +311,7 @@ body {
                 <button class="tool-btn" onclick="addVerticalLine()">
                     <span class="material-icons">add</span>Vertical Line
                 </button>
-            <br><br><br>
+            <br><br>
             </div>
             <div class="section-title" style="margin-top:13px;">QC Checklist</div>
             <ul class="checklist" id="qc-list">
@@ -289,6 +331,7 @@ body {
         <div class="image-container" id="imageContainer"><img id="mainImage" style="display: none;"></div>
         <div class="tools-overlay" id="toolsOverlay"></div>
     </div>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
 </div>
 <div class="controls">
     <button class="control-btn" onclick="rotateImage(-0.1)" title="Rotate Left"><span class="material-icons">rotate_left</span></button>
@@ -302,7 +345,6 @@ body {
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script>
-
 let imageContainer = document.getElementById('imageContainer');
 let mainImage = document.getElementById('mainImage');
 let toolsOverlay = document.getElementById('toolsOverlay');
@@ -314,6 +356,35 @@ let lastY = 0;
 let tools = [];
 let imagePosition = { x: 0, y: 0 };
 
+// --- HAMBURGER MENU MOBILE ---
+const sidebar = document.getElementById('sidebar');
+const sidebarToggle = document.getElementById('sidebarToggle');
+const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+function closeSidebarMobile() {
+    sidebar.classList.remove('visible');
+    if(sidebarOverlay) sidebarOverlay.style.opacity = '0';
+}
+function openSidebarMobile() {
+    sidebar.classList.add('visible');
+    if(sidebarOverlay) sidebarOverlay.style.opacity = '1';
+}
+sidebarToggle.addEventListener('click', function(e){
+    e.stopPropagation();
+    if (sidebar.classList.contains('visible')) {
+        closeSidebarMobile();
+    } else {
+        openSidebarMobile();
+    }
+});
+if(sidebarOverlay){
+    sidebarOverlay.addEventListener('click', closeSidebarMobile);
+}
+document.addEventListener('keydown', function(e){
+    if (e.key === "Escape") closeSidebarMobile();
+});
+
+// --------- RESTO DE FUNCIONALIDAD (tu JS original) -----------
 function init() {
     setupEventListeners();
     updateInfo();
@@ -452,7 +523,6 @@ function addHorizontalLine() {
 function addVerticalLine() {
     const line = document.createElement('div');
     line.className = 'vertical-line';
-    // SVG flecha up-down blanca dentro de círculo blanco traslúcido
     line.innerHTML = `<span class="line-icon" title="Vertical">
     <svg width="18" height="18" viewBox="0 0 18 18" style="display:inline;vertical-align:middle">
         <circle cx="9" cy="9" r="8" fill="#FFFFFF22" stroke="#fff" stroke-width="1.6"/>
@@ -487,10 +557,9 @@ function toggleCheck(checkbox) {
     checkbox.parentNode.parentNode.classList.toggle('completed', checkbox.checked);
 }
 function saveImage() {
-    // Seleccionamos solo el área de trabajo principal (sin menú lateral)
     var mainArea = document.getElementById('mainArea');
     html2canvas(mainArea, {
-        backgroundColor: "#111", // fondo como el real
+        backgroundColor: "#111",
         useCORS: true
     }).then(function(canvas) {
         var link = document.createElement('a');
