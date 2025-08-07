@@ -246,6 +246,11 @@ body {
         transition: transform 0.24s cubic-bezier(.77,0,.18,1);
         padding-bottom: 60px;
     }
+        #qc-list,
+    .sidebar-content > .section-title:last-of-type {
+        display: none !important;
+    }
+
     .sidebar.visible {
         transform: translateX(0);
     }
@@ -284,7 +289,7 @@ body {
 </style>
 </head>
 <body>
-<button class="hamburger-btn" id="sidebarToggle" aria-label="Abrir menú">
+<button class="hamburger-btn" id="sidebarToggle" aria-label="Open menu">
     <span class="material-icons" style="font-size:28px;">menu</span>
 </button>
 <div class="container">
@@ -296,6 +301,10 @@ body {
             </button>
             <button class="tool-btn" onclick="saveImage()">
                 <span class="material-icons">download</span> Save QC
+            </button>
+            <!-- Botón Info tras Save QC -->
+            <button id="infoBtn" class="tool-btn" title="How to use the tool">
+                <span class="material-icons">info</span> Info
             </button>
         </div>
         <div class="sidebar-content" style="width:100%;">
@@ -343,6 +352,30 @@ body {
     <div>Rotation: <span id="rotationLevel">0°</span></div>
 </div>
 <input type="file" class="file-input" id="fileInput" accept="image/*">
+
+<!-- PANEL DE AYUDA / HELP MODAL -->
+<div id="helpPanel" style="
+  display:none; position:fixed; top:60px; left:50%; transform:translateX(-50%);
+  max-width:370px; padding:17px 20px; background:rgba(40,38,54,0.99); color:#fff;
+  border-radius:10px; z-index:2200; font-size:15px; box-shadow:0 6px 22px #222a;">
+  <div style="font-size:19px; font-weight:600; margin-bottom:8px;">
+    How to use the QC tool
+  </div>
+  <div>
+    1. Upload a photo of your watch and adjust zoom and rotation as needed.<br>
+    2. Add index ruler and horizontal/vertical lines using the tool buttons.<br>
+    3. Move and resize all elements by dragging or using touch gestures.<br>
+    4. You can rotate the image with the left/right arrow keys on your keyboard.<br>
+    5. <b>You can delete any tool (ruler or guide) with a right click.</b><br>
+    6. <b>Use the checklist at the end of the menu to keep track of each QC point reviewed.</b><br>
+    7. Once finished, click "Save QC" to download your analysis as an image.<br>
+    <span style="color:#8af;display:block;margin-top:7px;">
+      Any questions or feedback? Contact me: 
+      <a href="https://www.reddit.com/user/jrverdes/" target="_blank" style="color:#ff0;">@jrverdes</a>
+    </span>
+  </div>
+  <button onclick="closeHelpPanel()" style="margin-top:14px; padding:6px 18px; border-radius:6px; border:none; background:#00bcd4; color:#fff; font-weight:600; font-size:15px; cursor:pointer;">Close</button>
+</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script>
@@ -537,16 +570,12 @@ function addIndexRuler() {
     ruler.className = 'index-ruler';
     ruler.style.width = '300px';
     ruler.style.height = '300px';
-
-    // Calcula el centro de la overlay en píxeles
     const overlayRect = toolsOverlay.getBoundingClientRect();
-    const left = overlayRect.width / 2 - 150; // 150 es la mitad del tamaño inicial
+    const left = overlayRect.width / 2 - 150;
     const top = overlayRect.height / 2 - 150;
-
     ruler.style.left = left + 'px';
     ruler.style.top = top + 'px';
     ruler.style.transform = '';
-
     makeDraggable(ruler);
     toolsOverlay.appendChild(ruler);
     tools.push(ruler);
@@ -563,7 +592,6 @@ function addHorizontalLine() {
             <polygon points="6,11 9,14 12,11" fill="#fff"/>
         </svg>
     </span>`;
-    // Centra en píxeles:
     const overlayRect = toolsOverlay.getBoundingClientRect();
     line.style.top = (overlayRect.height / 2) + 'px';
     line.style.left = '0px';
@@ -585,7 +613,6 @@ function addVerticalLine() {
             <polygon points="6,11 9,14 12,11" fill="#fff"/>
         </svg>
     </span>`;
-    // Centra en píxeles:
     const overlayRect = toolsOverlay.getBoundingClientRect();
     line.style.left = (overlayRect.width / 2) + 'px';
     line.style.top = '0px';
@@ -595,11 +622,8 @@ function addVerticalLine() {
     toolsOverlay.appendChild(line);
     tools.push(line);
 }
-// NUEVA makeDraggable (ratón + táctil):
 function makeDraggable(element, direction = 'both') {
     let drag = false, sX, sY, sLeft, sTop;
-
-    // Ratón
     element.addEventListener('mousedown', function(e) {
         drag = true; sX = e.clientX; sY = e.clientY;
         sLeft = parseInt(element.style.left) || 0;
@@ -614,8 +638,6 @@ function makeDraggable(element, direction = 'both') {
         if (direction === 'both' || direction === 'vertical') element.style.top = (sTop + dy) + 'px';
     });
     document.addEventListener('mouseup', function() { drag = false; });
-
-    // Táctil
     element.addEventListener('touchstart', function(e) {
         if (e.touches.length !== 1) return;
         const touch = e.touches[0];
@@ -654,6 +676,23 @@ function updateInfo() {
     document.getElementById('rotationLevel').textContent = Math.round(currentRotation * 10) / 10 + '°';
 }
 init();
+
+// ------ INFO BUTTON / HELP PANEL FUNCTIONALITY ------
+document.getElementById('infoBtn').onclick = function(e) {
+    e.stopPropagation();
+    document.getElementById('helpPanel').style.display = 'block';
+};
+function closeHelpPanel() {
+    document.getElementById('helpPanel').style.display = 'none';
+}
+// Close help panel if clicked outside (UX)
+document.addEventListener('click', function(e) {
+    const helpPanel = document.getElementById('helpPanel');
+    const infoBtn = document.getElementById('infoBtn');
+    if (helpPanel.style.display === 'block' && !helpPanel.contains(e.target) && e.target !== infoBtn) {
+        helpPanel.style.display = 'none';
+    }
+});
 </script>
 </body>
 </html>
